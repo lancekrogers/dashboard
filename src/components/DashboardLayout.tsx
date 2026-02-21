@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 function ConnectionStatus() {
   const mode =
     process.env.NEXT_PUBLIC_USE_MOCK === "true"
@@ -16,7 +18,7 @@ function ConnectionStatus() {
   );
 }
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
+export function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
       <header className="flex items-center justify-between px-6 py-3 border-b border-gray-800 bg-gray-900 shrink-0">

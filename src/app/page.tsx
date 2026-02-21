@@ -131,7 +131,6 @@ function MockDashboard() {
 
 export default function Home() {
   if (USE_MOCK) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     return <MockDashboard />;
   }
   return <LiveDashboard />;

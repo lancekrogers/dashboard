@@ -216,7 +216,7 @@ export function HCSFeed({
           className="flex-1 overflow-y-auto min-h-0"
         >
           {filteredMessages.map((msg) => (
-            <MessageRow key={msg.consensusTimestamp} message={msg} />
+            <MessageRow key={`${msg.topicId}-${msg.sequenceNumber}`} message={msg} />
           ))}
         </div>
       )}

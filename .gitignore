@@ -8,3 +8,4 @@ dist/
 *.log
 tsconfig.tsbuildinfo
 coverage/
+next-env.d.ts

@@ -116,14 +116,15 @@ function SummaryCards({ summary }: { summary: PnLSummary | null }) {
 function PnLChart({ data }: { data: PnLDataPoint[] }) {
   if (data.length === 0) {
     return (
-      <div className="h-[200px] flex items-center justify-center text-sm text-gray-500">
+      <div className="aspect-[5/2] flex items-center justify-center text-sm text-gray-500">
         Chart will appear when trading data is available.
       </div>
     );
   }
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
+    <div className="aspect-[5/2] w-full">
+    <ResponsiveContainer width="100%" height="100%">
       <LineChart
         data={data}
         margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
@@ -180,6 +181,7 @@ function PnLChart({ data }: { data: PnLDataPoint[] }) {
         />
       </LineChart>
     </ResponsiveContainer>
+    </div>
   );
 }
 
@@ -278,10 +280,10 @@ export function DeFiPnL({
 
   return (
     <div
-      className={`bg-gray-900 rounded-lg border border-gray-800 p-4 flex flex-col ${className}`}
+      className={`bg-gray-900 rounded-lg border border-gray-800 p-3 flex flex-col ${className}`}
     >
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-white">DeFi P&L (Base)</h2>
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h2 className="text-sm font-semibold text-white">DeFi P&L (Base)</h2>
         <div className="flex items-center gap-1.5">
           <div
             className={`w-2 h-2 rounded-full ${
@@ -303,8 +305,8 @@ export function DeFiPnL({
               <div key={i} className="h-14 bg-gray-800 rounded-lg" />
             ))}
           </div>
-          <div className="h-[200px] bg-gray-800 rounded-lg" />
-          <div className="h-[100px] bg-gray-800 rounded-lg" />
+          <div className="aspect-[5/2] bg-gray-800 rounded-lg" />
+          <div className="aspect-[5/1] bg-gray-800 rounded-lg" />
         </div>
       )}
 
@@ -324,7 +326,7 @@ export function DeFiPnL({
       )}
 
       {summary && (
-        <div className="space-y-4">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-3">
           <SummaryCards summary={summary} />
 
           <div>
@@ -338,9 +340,7 @@ export function DeFiPnL({
             <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">
               Recent Trades
             </h3>
-            <div className="overflow-y-auto max-h-[200px]">
-              <TradeTable trades={trades} />
-            </div>
+            <TradeTable trades={trades} />
           </div>
         </div>
       )}

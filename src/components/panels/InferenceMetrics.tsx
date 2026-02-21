@@ -36,7 +36,7 @@ function ComputeGauge({ compute }: { compute: ComputeMetrics | null }) {
     );
   }
 
-  const percentage = compute.gpuUtilization;
+  const percentage = Math.round(compute.gpuUtilization);
   const color =
     percentage < 50 ? "#22c55e" : percentage < 80 ? "#eab308" : "#ef4444";
   const radius = 15.9;
@@ -55,7 +55,7 @@ function ComputeGauge({ compute }: { compute: ComputeMetrics | null }) {
       <h3 className="text-xs text-gray-500 uppercase tracking-wider text-center mb-2">
         GPU Utilization
       </h3>
-      <div className="relative w-32 h-32 mx-auto">
+      <div className="relative w-20 h-20 mx-auto">
         <svg viewBox="0 0 36 36" className="w-full h-full">
           <circle
             cx="18"
@@ -79,7 +79,7 @@ function ComputeGauge({ compute }: { compute: ComputeMetrics | null }) {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-bold" style={{ color }}>
+          <span className="text-sm font-bold" style={{ color }}>
             {percentage}%
           </span>
         </div>
@@ -88,7 +88,7 @@ function ComputeGauge({ compute }: { compute: ComputeMetrics | null }) {
         <div>
           <p className="text-xs text-gray-500">Memory</p>
           <p className={`text-sm tabular-nums ${memColor}`}>
-            {compute.memoryUtilization}%
+            {Math.round(compute.memoryUtilization)}%
           </p>
         </div>
         <div>
@@ -227,7 +227,7 @@ function JobTable({ jobs }: { jobs: InferenceJob[] }) {
       <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">
         Recent Inference Jobs
       </h3>
-      <div className="overflow-y-auto max-h-[180px]">
+      <div className="overflow-y-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-700 sticky top-0 bg-gray-900">
             <tr>
@@ -299,10 +299,10 @@ export function InferenceMetrics({
 }: InferenceMetricsProps) {
   return (
     <div
-      className={`bg-gray-900 rounded-lg border border-gray-800 p-4 flex flex-col ${className}`}
+      className={`bg-gray-900 rounded-lg border border-gray-800 p-3 flex flex-col ${className}`}
     >
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-white">
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h2 className="text-sm font-semibold text-white">
           Inference &amp; 0G Metrics
         </h2>
         <div className="flex items-center gap-1.5">
@@ -347,8 +347,8 @@ export function InferenceMetrics({
       )}
 
       {(compute || storage) && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-3">
+          <div className="grid grid-cols-2 gap-3">
             <ComputeGauge compute={compute} />
             <StorageUsage storage={storage} />
           </div>

@@ -80,7 +80,7 @@ function AgentCard({ agent }: { agent: AgentInfo | null }) {
 
   return (
     <div
-      className={`bg-gray-800/50 rounded-lg border border-gray-700 border-t-2 ${accent} p-4 space-y-2`}
+      className={`bg-gray-800/50 rounded-lg border border-gray-700 border-l-2 ${accent} p-3 space-y-1`}
     >
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-100 capitalize">
@@ -142,10 +142,10 @@ export function AgentActivity({
 
   return (
     <div
-      className={`bg-gray-900 rounded-lg border border-gray-800 p-4 ${className}`}
+      className={`bg-gray-900 rounded-lg border border-gray-800 p-3 flex flex-col ${className}`}
     >
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-white">Agent Activity</h2>
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h2 className="text-sm font-semibold text-white">Agent Activity</h2>
         <div className="flex items-center gap-1.5">
           <div
             className={`w-2 h-2 rounded-full ${
@@ -161,9 +161,9 @@ export function AgentActivity({
       </div>
 
       {isLoading && agents.length === 0 && (
-        <div className="grid grid-cols-3 gap-3 animate-pulse">
+        <div className="space-y-2 animate-pulse">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gray-800 rounded-lg h-32" />
+            <div key={i} className="bg-gray-800 rounded-lg h-20" />
           ))}
         </div>
       )}
@@ -175,7 +175,7 @@ export function AgentActivity({
       )}
 
       {!isLoading && !error && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-2">
           {AGENT_ORDER.map((name) => (
             <AgentCard
               key={name}

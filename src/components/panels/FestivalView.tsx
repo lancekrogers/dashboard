@@ -168,11 +168,11 @@ export function FestivalView({
 
   return (
     <div
-      className={`bg-gray-900 rounded-lg border border-gray-800 p-4 overflow-auto ${className}`}
+      className={`bg-gray-900 rounded-lg border border-gray-800 p-3 flex flex-col ${className}`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-white">Festival Progress</h2>
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h2 className="text-sm font-semibold text-white">Festival Progress</h2>
         {data && (
           <span className="text-sm text-gray-400">
             {data.overallCompletionPercent}% complete
@@ -205,13 +205,13 @@ export function FestivalView({
 
       {/* Data */}
       {data && (
-        <>
+        <div className="flex-1 min-h-0 flex flex-col">
           <ProgressBar
             percentage={data.overallCompletionPercent}
             size="md"
-            className="mb-4"
+            className="mb-3 shrink-0"
           />
-          <div className="space-y-0">
+          <div className="flex-1 min-h-0 overflow-y-auto space-y-0">
             {data.phases.map((phase) => (
               <PhaseRow
                 key={phase.id}
@@ -223,7 +223,7 @@ export function FestivalView({
               />
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

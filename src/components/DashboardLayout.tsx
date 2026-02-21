@@ -20,7 +20,7 @@ function ConnectionStatus() {
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
       <header className="flex items-center justify-between px-6 py-3 border-b border-gray-800 bg-gray-900 shrink-0">
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-bold text-white">
@@ -32,7 +32,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
         <ConnectionStatus />
       </header>
-      <main className="grid grid-cols-3 grid-rows-[2fr_1fr] gap-4 p-4 flex-1 min-h-0">
+      <main className="grid grid-cols-3 grid-rows-[1fr_1fr] gap-3 p-3 flex-1 min-h-0">
         {children}
       </main>
     </div>

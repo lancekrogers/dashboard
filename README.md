@@ -14,6 +14,10 @@ This project is part of an [Obedience Corp](https://obediencecorp.com) campaign 
 
 The Festival View panel visualizes festival methodology progress. Agent events flow through the **obey daemon's** event pipeline via WebSocket or gRPC.
 
+## Screenshot
+
+![Dashboard](docs/dashboard.png)
+
 ## Panels
 
 | Panel | Description |

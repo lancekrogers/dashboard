@@ -21,24 +21,42 @@ interface InferenceMetricsProps {
   className?: string;
 }
 
-function GaugeCircle({
-  percentage,
-  label,
-}: {
-  percentage: number;
-  label: string;
-}) {
+function ComputeGauge({ compute }: { compute: ComputeMetrics | null }) {
+  if (!compute) {
+    return (
+      <div className="bg-gray-800 rounded-lg p-4 animate-pulse">
+        <div className="h-4 bg-gray-700 rounded w-24 mx-auto mb-3" />
+        <div className="w-32 h-32 mx-auto bg-gray-700 rounded-full" />
+        <div className="grid grid-cols-2 gap-2 mt-3">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-8 bg-gray-700 rounded" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const percentage = compute.gpuUtilization;
+  const color =
+    percentage < 50 ? "#22c55e" : percentage < 80 ? "#eab308" : "#ef4444";
   const radius = 15.9;
   const circumference = 2 * Math.PI * radius;
-  const clamped = Math.max(0, Math.min(100, percentage));
-  const dashArray = `${(clamped / 100) * circumference} ${circumference}`;
-  const color =
-    clamped > 80 ? "#ef4444" : clamped > 50 ? "#eab308" : "#22c55e";
+  const dashArray = `${(percentage / 100) * circumference} ${circumference}`;
+
+  const memColor =
+    compute.memoryUtilization < 50
+      ? "text-green-400"
+      : compute.memoryUtilization < 80
+        ? "text-yellow-400"
+        : "text-red-400";
 
   return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="relative w-20 h-20">
-        <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-xs text-gray-500 uppercase tracking-wider text-center mb-2">
+        GPU Utilization
+      </h3>
+      <div className="relative w-32 h-32 mx-auto">
+        <svg viewBox="0 0 36 36" className="w-full h-full">
           <circle
             cx="18"
             cy="18"
@@ -54,18 +72,144 @@ function GaugeCircle({
             fill="none"
             stroke={color}
             strokeWidth="3"
-            strokeDasharray={dashArray}
             strokeLinecap="round"
+            strokeDasharray={dashArray}
+            transform="rotate(-90 18 18)"
             className="transition-all duration-500"
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-sm font-semibold text-white tabular-nums">
-            {clamped.toFixed(0)}%
+          <span className="text-2xl font-bold" style={{ color }}>
+            {percentage}%
           </span>
         </div>
       </div>
-      <span className="text-xs text-gray-500">{label}</span>
+      <div className="grid grid-cols-2 gap-2 mt-3">
+        <div>
+          <p className="text-xs text-gray-500">Memory</p>
+          <p className={`text-sm tabular-nums ${memColor}`}>
+            {compute.memoryUtilization}%
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500">Active Jobs</p>
+          <p className="text-sm text-gray-300 tabular-nums">
+            {compute.activeJobs}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500">Avg Latency</p>
+          <p className="text-sm text-gray-300 tabular-nums">
+            {compute.avgLatencyMs}ms
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500">Total</p>
+          <p className="text-sm text-gray-300 tabular-nums">
+            {compute.totalInferences.toLocaleString()}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StorageUsage({ storage }: { storage: StorageMetrics | null }) {
+  if (!storage) {
+    return (
+      <div className="bg-gray-800 rounded-lg p-4 animate-pulse">
+        <div className="h-4 bg-gray-700 rounded w-24 mb-3" />
+        <div className="h-4 bg-gray-700 rounded w-32 mb-2" />
+        <div className="h-4 bg-gray-700 rounded w-28 mb-3" />
+        <div className="h-3 bg-gray-700 rounded mb-2" />
+        <div className="h-4 bg-gray-700 rounded w-16" />
+      </div>
+    );
+  }
+
+  const percentage = (storage.usedStorageGb / storage.totalStorageGb) * 100;
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+        Storage Usage
+      </h3>
+      <div className="space-y-2">
+        <p className="text-sm text-white">
+          Used: {storage.usedStorageGb.toFixed(1)} GB
+        </p>
+        <p className="text-sm text-gray-500">
+          Total: {storage.totalStorageGb.toFixed(1)} GB
+        </p>
+        <ProgressBar percentage={percentage} size="md" />
+        <p className="text-sm text-gray-300 tabular-nums">
+          {percentage.toFixed(1)}%
+        </p>
+        <p className="text-xs text-gray-500">
+          Objects: {storage.objectCount.toLocaleString()}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+const INFT_STATUS_STYLES: Record<string, string> = {
+  active: "bg-green-900 text-green-400",
+  minting: "bg-yellow-900 text-yellow-400",
+  inactive: "bg-gray-800 text-gray-400",
+};
+
+function INFTCard({ inft }: { inft: INFTStatus | null }) {
+  if (!inft) {
+    return (
+      <div className="bg-gray-800 rounded-lg p-4 animate-pulse">
+        <div className="h-4 bg-gray-700 rounded w-20 mb-3" />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="h-8 bg-gray-700 rounded" />
+          <div className="h-8 bg-gray-700 rounded" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">
+        iNFT Status
+      </h3>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1">
+          <p className="text-sm text-gray-300">
+            <span className="text-gray-500">Token: </span>
+            <span className="font-mono">{inft.tokenId}</span>
+          </p>
+          <p className="text-sm text-gray-300">
+            <span className="text-gray-500">Status: </span>
+            <span
+              className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
+                INFT_STATUS_STYLES[inft.status] || INFT_STATUS_STYLES.inactive
+              }`}
+            >
+              {inft.status}
+            </span>
+          </p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm text-gray-300">
+            <span className="text-gray-500">Model: </span>
+            {inft.modelName}
+          </p>
+          <p className="text-sm text-gray-300">
+            <span className="text-gray-500">Inferences: </span>
+            <span className="tabular-nums">
+              {inft.inferenceCount.toLocaleString()}
+            </span>
+          </p>
+        </div>
+      </div>
+      <p className="text-xs text-gray-500 mt-2">
+        Last Active: {formatTimeAgo(inft.lastActive)}
+      </p>
     </div>
   );
 }
@@ -77,11 +221,71 @@ const JOB_STATUS_STYLES: Record<string, string> = {
   failed: "bg-red-900 text-red-400",
 };
 
-const INFT_STATUS_MAP: Record<string, string> = {
-  active: "bg-green-900 text-green-400",
-  minting: "bg-yellow-900 text-yellow-400",
-  inactive: "bg-gray-800 text-gray-400",
-};
+function JobTable({ jobs }: { jobs: InferenceJob[] }) {
+  return (
+    <div>
+      <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">
+        Recent Inference Jobs
+      </h3>
+      <div className="overflow-y-auto max-h-[180px]">
+        <table className="w-full text-sm">
+          <thead className="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-700 sticky top-0 bg-gray-900">
+            <tr>
+              <th className="text-left py-1 font-medium">Model</th>
+              <th className="text-center py-1 font-medium">Status</th>
+              <th className="text-center py-1 font-medium">Tokens</th>
+              <th className="text-right py-1 font-medium">Latency</th>
+              <th className="text-right py-1 font-medium">Time</th>
+            </tr>
+          </thead>
+          <tbody className="font-mono">
+            {jobs.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center text-gray-500 py-4">
+                  No inference jobs recorded yet.
+                </td>
+              </tr>
+            ) : (
+              jobs.slice(0, 30).map((job) => (
+                <tr
+                  key={job.id}
+                  className="text-sm text-gray-300 border-b border-gray-800"
+                >
+                  <td className="py-1.5 truncate max-w-[100px]">
+                    {job.model}
+                  </td>
+                  <td className="py-1.5 text-center">
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${
+                        JOB_STATUS_STYLES[job.status] ||
+                        JOB_STATUS_STYLES.pending
+                      }`}
+                    >
+                      {job.status}
+                    </span>
+                  </td>
+                  <td className="py-1.5 text-center text-xs">
+                    {job.inputTokens}/
+                    {job.status === "running" ? "..." : job.outputTokens}
+                  </td>
+                  <td className="py-1.5 text-right text-xs">
+                    {job.status === "running" ? "..." : `${job.latencyMs}ms`}
+                  </td>
+                  <td className="py-1.5 text-right text-xs text-gray-500">
+                    {new Date(job.timestamp).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 export function InferenceMetrics({
   compute,
@@ -95,27 +299,34 @@ export function InferenceMetrics({
 }: InferenceMetricsProps) {
   return (
     <div
-      className={`bg-gray-900 rounded-lg border border-gray-800 p-4 ${className}`}
+      className={`bg-gray-900 rounded-lg border border-gray-800 p-4 flex flex-col ${className}`}
     >
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-white">Inference Metrics</h2>
+        <h2 className="text-lg font-semibold text-white">
+          Inference &amp; 0G Metrics
+        </h2>
         <div className="flex items-center gap-1.5">
           <div
             className={`w-2 h-2 rounded-full ${
-              connectionState === "connected" ? "bg-green-500" : "bg-red-500"
+              connectionState === "connected"
+                ? "bg-green-500"
+                : connectionState === "connecting"
+                  ? "bg-yellow-500"
+                  : "bg-red-500"
             }`}
           />
-          <span className="text-xs text-gray-500">0G</span>
+          <span className="text-xs text-gray-500">{connectionState}</span>
         </div>
       </div>
 
-      {isLoading && !compute && (
-        <div className="space-y-3 animate-pulse">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="h-28 bg-gray-800 rounded-lg" />
-            <div className="h-28 bg-gray-800 rounded-lg" />
+      {isLoading && !compute && !storage && (
+        <div className="space-y-4 animate-pulse">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="h-56 bg-gray-800 rounded-lg" />
+            <div className="h-56 bg-gray-800 rounded-lg" />
           </div>
-          <div className="h-16 bg-gray-800 rounded-lg" />
+          <div className="h-24 bg-gray-800 rounded-lg" />
+          <div className="h-32 bg-gray-800 rounded-lg" />
         </div>
       )}
 
@@ -129,172 +340,22 @@ export function InferenceMetrics({
         <div className="text-sm text-gray-500">
           <p>No inference data available</p>
           <p className="text-xs mt-1">
-            Metrics will appear once the inference agent connects to 0G.
+            Inference metrics will display once the inference agent connects to
+            0G compute.
           </p>
         </div>
       )}
 
       {(compute || storage) && (
         <div className="space-y-4">
-          {/* Compute + Storage */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Compute */}
-            {compute && (
-              <div className="bg-gray-800/50 rounded-lg p-3">
-                <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">
-                  Compute
-                </h3>
-                <div className="flex justify-around">
-                  <GaugeCircle percentage={compute.gpuUtilization} label="GPU" />
-                  <GaugeCircle
-                    percentage={compute.memoryUtilization}
-                    label="Memory"
-                  />
-                </div>
-                <div className="grid grid-cols-3 gap-1 mt-2 text-center">
-                  <div>
-                    <p className="text-[10px] text-gray-500">Jobs</p>
-                    <p className="text-xs text-gray-300 tabular-nums">
-                      {compute.activeJobs}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-gray-500">Latency</p>
-                    <p className="text-xs text-gray-300 tabular-nums">
-                      {compute.avgLatencyMs}ms
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-gray-500">Total</p>
-                    <p className="text-xs text-gray-300 tabular-nums">
-                      {compute.totalInferences.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Storage */}
-            {storage && (
-              <div className="bg-gray-800/50 rounded-lg p-3">
-                <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">
-                  Storage
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">
-                      {storage.usedStorageGb.toFixed(1)} GB
-                    </span>
-                    <span className="text-gray-500">
-                      / {storage.totalStorageGb.toFixed(1)} GB
-                    </span>
-                  </div>
-                  <ProgressBar
-                    percentage={
-                      (storage.usedStorageGb / storage.totalStorageGb) * 100
-                    }
-                    size="md"
-                  />
-                  <div className="text-center">
-                    <p className="text-[10px] text-gray-500">Objects</p>
-                    <p className="text-xs text-gray-300 tabular-nums">
-                      {storage.objectCount.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+          <div className="grid grid-cols-2 gap-4">
+            <ComputeGauge compute={compute} />
+            <StorageUsage storage={storage} />
           </div>
 
-          {/* iNFT Status */}
-          {inft && (
-            <div className="bg-gray-800/50 rounded-lg p-3">
-              <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">
-                iNFT
-              </h3>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <span className="text-gray-500">Token: </span>
-                  <span className="text-gray-300 font-mono">{inft.tokenId}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500">Status: </span>
-                  <span
-                    className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
-                      INFT_STATUS_MAP[inft.status] || INFT_STATUS_MAP.inactive
-                    }`}
-                  >
-                    {inft.status}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-500">Model: </span>
-                  <span className="text-gray-300">{inft.modelName}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500">Inferences: </span>
-                  <span className="text-gray-300 tabular-nums">
-                    {inft.inferenceCount.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-              <p className="text-[10px] text-gray-500 mt-1">
-                Last active: {formatTimeAgo(inft.lastActive)}
-              </p>
-            </div>
-          )}
+          <INFTCard inft={inft} />
 
-          {/* Job Table */}
-          {jobs.length > 0 && (
-            <div>
-              <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">
-                Recent Jobs
-              </h3>
-              <div className="overflow-auto max-h-[180px]">
-                <table className="w-full text-xs">
-                  <thead className="text-gray-500 border-b border-gray-800 sticky top-0 bg-gray-900">
-                    <tr>
-                      <th className="text-left py-1 font-medium">Model</th>
-                      <th className="text-left py-1 font-medium">Status</th>
-                      <th className="text-right py-1 font-medium">Tokens</th>
-                      <th className="text-right py-1 font-medium">Latency</th>
-                      <th className="text-right py-1 font-medium">Time</th>
-                    </tr>
-                  </thead>
-                  <tbody className="font-mono">
-                    {jobs.slice(0, 30).map((job) => (
-                      <tr key={job.id} className="border-b border-gray-800/50">
-                        <td className="py-1 text-gray-300">{job.model}</td>
-                        <td className="py-1">
-                          <span
-                            className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
-                              JOB_STATUS_STYLES[job.status] ||
-                              JOB_STATUS_STYLES.pending
-                            }`}
-                          >
-                            {job.status}
-                          </span>
-                        </td>
-                        <td className="py-1 text-right text-gray-300 tabular-nums">
-                          {job.status === "running"
-                            ? "..."
-                            : `${job.inputTokens}/${job.outputTokens}`}
-                        </td>
-                        <td className="py-1 text-right text-gray-300 tabular-nums">
-                          {job.status === "running"
-                            ? "..."
-                            : `${job.latencyMs}ms`}
-                        </td>
-                        <td className="py-1 text-right text-gray-500">
-                          {formatTimeAgo(job.timestamp)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+          <JobTable jobs={jobs} />
         </div>
       )}
     </div>

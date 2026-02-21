@@ -63,7 +63,7 @@ function HeartbeatDot({ lastHeartbeat }: { lastHeartbeat: string }) {
   );
 }
 
-function AgentCard({ agent }: { agent: AgentInfo | null; name: string }) {
+function AgentCard({ agent }: { agent: AgentInfo | null }) {
   if (!agent) {
     return (
       <div className="bg-gray-800/50 rounded-lg border border-gray-700 border-t-2 border-t-gray-600 p-4">
@@ -179,7 +179,6 @@ export function AgentActivity({
           {AGENT_ORDER.map((name) => (
             <AgentCard
               key={name}
-              name={name}
               agent={agentMap.get(name) || null}
             />
           ))}

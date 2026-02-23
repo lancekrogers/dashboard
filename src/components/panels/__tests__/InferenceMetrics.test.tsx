@@ -114,7 +114,7 @@ describe("InferenceMetrics", () => {
       />,
     );
     const gaugeText = container.querySelector(
-      ".text-2xl.font-bold",
+      ".text-sm.font-bold",
     ) as HTMLElement;
     expect(gaugeText?.style.color).toBe("rgb(34, 197, 94)");
   });
@@ -127,7 +127,7 @@ describe("InferenceMetrics", () => {
       />,
     );
     const gaugeText = container.querySelector(
-      ".text-2xl.font-bold",
+      ".text-sm.font-bold",
     ) as HTMLElement;
     expect(gaugeText?.style.color).toBe("rgb(234, 179, 8)");
   });
@@ -140,7 +140,7 @@ describe("InferenceMetrics", () => {
       />,
     );
     const gaugeText = container.querySelector(
-      ".text-2xl.font-bold",
+      ".text-sm.font-bold",
     ) as HTMLElement;
     expect(gaugeText?.style.color).toBe("rgb(239, 68, 68)");
   });

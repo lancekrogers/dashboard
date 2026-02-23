@@ -173,7 +173,7 @@ describe("HCSFeed", () => {
     const { container } = render(
       <HCSFeed messages={messages} connectionState="connected" isLoading={false} error={null} />
     );
-    const messageRows = container.querySelectorAll(".border-b.border-gray-800.px-3");
+    const messageRows = container.querySelectorAll(".border-b.border-gray-800.px-3.py-2:not(.shrink-0)");
     expect(messageRows.length).toBe(500);
   });
 });

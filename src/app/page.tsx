@@ -6,64 +6,62 @@ import { HCSFeed } from "@/components/panels/HCSFeed";
 import { AgentActivity } from "@/components/panels/AgentActivity";
 import { DeFiPnL } from "@/components/panels/DeFiPnL";
 import { InferenceMetrics } from "@/components/panels/InferenceMetrics";
-import { useWebSocket } from "@/hooks/useWebSocket";
-import { useMirrorNode } from "@/hooks/useMirrorNode";
+import { useLiveData } from "@/hooks/useLiveData";
 import { useMockData } from "@/hooks/useMockData";
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
 
 function LiveDashboard() {
-  const ws = useWebSocket();
-  const mirror = useMirrorNode();
+  const live = useLiveData();
 
   return (
     <DashboardLayout>
       <div className="overflow-hidden min-h-0">
         <FestivalView
-          data={mirror.festivalProgress}
-          isLoading={mirror.isLoading}
-          error={mirror.error}
+          data={live.festivalProgress}
+          isLoading={live.isLoading}
+          error={live.error}
           className="h-full"
         />
       </div>
       <div className="overflow-hidden min-h-0">
         <HCSFeed
-          messages={mirror.data || []}
-          connectionState={mirror.connectionState}
-          isLoading={mirror.isLoading}
-          error={mirror.error}
+          messages={live.hcsMessages}
+          connectionState={live.connectionState}
+          isLoading={live.isLoading}
+          error={live.error}
           className="h-full"
         />
       </div>
       <div className="overflow-hidden min-h-0">
         <AgentActivity
-          agents={ws.agents}
-          connectionState={ws.connectionState}
-          isLoading={ws.isLoading}
-          error={ws.error}
+          agents={live.agents}
+          connectionState={live.connectionState}
+          isLoading={live.isLoading}
+          error={live.error}
           className="h-full"
         />
       </div>
       <div className="col-span-2 overflow-hidden min-h-0">
         <DeFiPnL
-          summary={null}
-          chartData={[]}
-          trades={[]}
-          connectionState={ws.connectionState}
-          isLoading={ws.isLoading}
-          error={null}
+          summary={live.pnlSummary}
+          chartData={live.pnlChart}
+          trades={live.trades}
+          connectionState={live.connectionState}
+          isLoading={live.isLoading}
+          error={live.error}
           className="h-full"
         />
       </div>
       <div className="overflow-hidden min-h-0">
         <InferenceMetrics
-          compute={null}
-          storage={null}
-          inft={null}
-          jobs={[]}
-          connectionState={ws.connectionState}
-          isLoading={ws.isLoading}
-          error={null}
+          compute={live.compute}
+          storage={live.storage}
+          inft={live.inft}
+          jobs={live.inferenceJobs}
+          connectionState={live.connectionState}
+          isLoading={live.isLoading}
+          error={live.error}
           className="h-full"
         />
       </div>

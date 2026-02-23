@@ -29,7 +29,7 @@
     "@testing-library/react": "^16.3.2",
     "@types/jest": "^30.0.0",
     "@typescript-eslint/parser": "^8.56.0",
-    "eslint": "^9.39.3",
+    "eslint": "^10.0.1",
     "eslint-config-next": "^16.1.6",
     "globals": "^17.3.0",
     "jest": "^30.2.0",

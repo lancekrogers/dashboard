@@ -46,7 +46,8 @@ export interface MockDataResult {
 
 const MSG_TYPES: DaemonEventType[] = [
   "task_assignment", "status_update", "heartbeat",
-  "quality_gate", "payment_settled", "task_result",
+  "quality_gate", "payment_settled", "task_result", "pnl_report",
+  "risk_check_requested", "risk_check_approved", "risk_check_denied",
 ];
 const AGENTS = ["coordinator", "inference", "defi"];
 const MESSAGES = [
@@ -56,6 +57,9 @@ const MESSAGES = [
   "Trade signal detected: ETH/USDC",
   "Quality gate checkpoint reached",
   "Payment 0.3 HBAR settled",
+  "CRE risk requested for execute_trade",
+  "CRE risk approved with max_position_usd=810000000",
+  "CRE risk denied: signal_confidence_below_threshold",
 ];
 
 export function useMockData(): MockDataResult {

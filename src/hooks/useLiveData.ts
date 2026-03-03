@@ -177,6 +177,25 @@ export function useLiveData(): LiveDataResult {
         break;
       }
 
+      case "pnl_report": {
+        if (
+          p.totalRevenue !== undefined &&
+          p.totalCosts !== undefined &&
+          p.netProfit !== undefined
+        ) {
+          setPnlSummary({
+            totalRevenue: (p.totalRevenue as number) ?? 0,
+            totalCosts: (p.totalCosts as number) ?? 0,
+            netProfit: (p.netProfit as number) ?? 0,
+            tradeCount: (p.tradeCount as number) ?? 0,
+            winCount: (p.winCount as number) ?? 0,
+            lossCount: (p.lossCount as number) ?? 0,
+            winRate: (p.winRate as number) ?? 0,
+          });
+        }
+        break;
+      }
+
       case "payment_settled": {
         // Could also update P&L from payment events
         if (p.amount && p.txHash) {

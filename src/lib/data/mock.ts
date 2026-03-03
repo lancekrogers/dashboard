@@ -28,6 +28,11 @@ const PAYLOADS: Record<DaemonEventType, string[]> = {
     "Quality gate passed: all tests green",
     "Trade execution completed: ETH/USDC buy at $3,245.50",
   ],
+  pnl_report: [
+    "PnL report: net +$124.60, win rate 68%",
+    "PnL report: net +$130.22, 24 trades",
+    "PnL report: self_sustaining=true",
+  ],
   heartbeat: [
     "GPU: 78% | Memory: 45% | Active jobs: 3",
     "GPU: 82% | Memory: 51% | Active jobs: 4",
@@ -42,6 +47,18 @@ const PAYLOADS: Record<DaemonEventType, string[]> = {
     "Payment 0.5 HBAR settled for task completion",
     "Payment 1.2 HBAR settled for inference job #5678",
     "Gas refund 0.01 HBAR processed",
+  ],
+  risk_check_requested: [
+    "CRE risk check requested for execute_trade task",
+    "CRE risk check requested for defi-001",
+  ],
+  risk_check_approved: [
+    "CRE approved task with constrained position and slippage",
+    "CRE approved trade execution constraints for defi-001",
+  ],
+  risk_check_denied: [
+    "CRE denied task: signal_confidence_below_threshold",
+    "CRE denied task: cre_unreachable",
   ],
   agent_started: ["Agent coordinator initialized and ready"],
   agent_stopped: ["Agent defi entering idle mode"],
@@ -131,8 +148,9 @@ export function generateMockFestivalProgress(): FestivalProgress {
 
 const AGENTS = ["coordinator", "inference", "defi"] as const;
 const MSG_TYPES: DaemonEventType[] = [
-  "task_assignment", "status_update", "task_result",
+  "task_assignment", "status_update", "task_result", "pnl_report",
   "heartbeat", "quality_gate", "payment_settled",
+  "risk_check_requested", "risk_check_approved", "risk_check_denied",
 ];
 
 export function generateMockHCSMessages(count: number): HCSMessage[] {

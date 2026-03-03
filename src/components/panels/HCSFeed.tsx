@@ -19,9 +19,13 @@ const MESSAGE_TYPE_COLORS: Record<string, string> = {
   task_assignment: "bg-purple-900 text-purple-400",
   status_update: "bg-blue-900 text-blue-400",
   task_result: "bg-green-900 text-green-400",
+  pnl_report: "bg-indigo-900 text-indigo-400",
   heartbeat: "bg-gray-800 text-gray-400",
   quality_gate: "bg-yellow-900 text-yellow-400",
   payment_settled: "bg-emerald-900 text-emerald-400",
+  risk_check_requested: "bg-cyan-900 text-cyan-400",
+  risk_check_approved: "bg-teal-900 text-teal-400",
+  risk_check_denied: "bg-rose-900 text-rose-400",
   agent_started: "bg-blue-900 text-blue-400",
   agent_stopped: "bg-gray-800 text-gray-400",
   agent_error: "bg-red-900 text-red-400",
@@ -139,8 +143,9 @@ export function HCSFeed({
   };
 
   const allTypes: DaemonEventType[] = [
-    "task_assignment", "status_update", "task_result",
+    "task_assignment", "status_update", "task_result", "pnl_report",
     "heartbeat", "quality_gate", "payment_settled",
+    "risk_check_requested", "risk_check_approved", "risk_check_denied",
     "agent_started", "agent_stopped", "agent_error",
   ];
 

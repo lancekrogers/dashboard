@@ -6,6 +6,7 @@ import { HCSFeed } from "@/components/panels/HCSFeed";
 import { AgentActivity } from "@/components/panels/AgentActivity";
 import { DeFiPnL } from "@/components/panels/DeFiPnL";
 import { InferenceMetrics } from "@/components/panels/InferenceMetrics";
+import { CREDecisions } from "@/components/panels/CREDecisions";
 import { useLiveData } from "@/hooks/useLiveData";
 import { useMockData } from "@/hooks/useMockData";
 
@@ -34,6 +35,15 @@ function LiveDashboard() {
         />
       </div>
       <div className="overflow-hidden min-h-0">
+        <CREDecisions
+          messages={live.hcsMessages}
+          connectionState={live.connectionState}
+          isLoading={live.isLoading}
+          error={live.error}
+          className="h-full"
+        />
+      </div>
+      <div className="overflow-hidden min-h-0">
         <AgentActivity
           agents={live.agents}
           connectionState={live.connectionState}
@@ -42,7 +52,7 @@ function LiveDashboard() {
           className="h-full"
         />
       </div>
-      <div className="col-span-2 overflow-hidden min-h-0">
+      <div className="overflow-hidden min-h-0">
         <DeFiPnL
           summary={live.pnlSummary}
           chartData={live.pnlChart}
@@ -92,6 +102,15 @@ function MockDashboard() {
         />
       </div>
       <div className="overflow-hidden min-h-0">
+        <CREDecisions
+          messages={mock.hcsMessages}
+          connectionState={mock.connectionState}
+          isLoading={mock.isLoading}
+          error={mock.error}
+          className="h-full"
+        />
+      </div>
+      <div className="overflow-hidden min-h-0">
         <AgentActivity
           agents={mock.agents}
           connectionState={mock.connectionState}
@@ -100,7 +119,7 @@ function MockDashboard() {
           className="h-full"
         />
       </div>
-      <div className="col-span-2 overflow-hidden min-h-0">
+      <div className="overflow-hidden min-h-0">
         <DeFiPnL
           summary={mock.pnlSummary}
           chartData={mock.pnlChart}

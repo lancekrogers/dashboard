@@ -26,9 +26,13 @@ export type DaemonEventType =
   | "task_assignment"
   | "status_update"
   | "task_result"
+  | "pnl_report"
   | "heartbeat"
   | "quality_gate"
   | "payment_settled"
+  | "risk_check_requested"
+  | "risk_check_approved"
+  | "risk_check_denied"
   | "agent_started"
   | "agent_stopped"
   | "agent_error";

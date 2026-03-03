@@ -24,6 +24,7 @@ The Festival View panel visualizes festival methodology progress. Agent events f
 |-------|-------------|
 | Festival View | Festival methodology progress (phases, sequences, tasks) |
 | HCS Feed | Live Hedera Consensus Service message stream |
+| CRE Decisions | CRE risk lifecycle (`risk_check_requested/approved/denied`) with decision reasons |
 | Agent Activity | Agent status, heartbeats, uptime |
 | DeFi P&L | Trading performance, profit/loss charts |
 | Inference Metrics | 0G compute job stats, storage, iNFT status |

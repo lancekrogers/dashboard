@@ -21,7 +21,7 @@ function makeMessages(count: number): HCSMessage[] {
       consensusTimestamp: new Date(Date.now() - (count - i) * 1000).toISOString(),
       sequenceNumber: i + 1,
       message: `Message ${i + 1}`,
-      messageType: ["task_assignment", "status_update", "heartbeat", "quality_gate", "payment_settled", "task_result"][i % 6] as HCSMessage["messageType"],
+      messageType: ["task_assignment", "status_update", "heartbeat", "quality_gate", "payment_settled", "task_result", "risk_check_requested", "risk_check_approved", "risk_check_denied", "pnl_report"][i % 10] as HCSMessage["messageType"],
       senderAgent: ["coordinator", "inference", "defi"][i % 3],
     })
   );
@@ -128,11 +128,12 @@ describe("HCSFeed", () => {
       <HCSFeed messages={messages} connectionState="connected" isLoading={false} error={null} />
     );
     fireEvent.click(getByText("Filter"));
-    // Should now show checkboxes for all 9 message types
+    // Should now show checkboxes for all 13 message types.
     const checkboxes = getAllByRole("checkbox");
-    expect(checkboxes.length).toBe(9);
+    expect(checkboxes.length).toBe(13);
     // Verify a type that isn't in the messages to avoid ambiguity
     expect(getByText("agent_started")).toBeTruthy();
+    expect(getByText("risk_check_approved")).toBeTruthy();
   });
 
   it("filters messages when type is toggled", () => {

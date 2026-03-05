@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useWebSocket } from "./useWebSocket";
 import { useMirrorNode } from "./useMirrorNode";
+import { useSyntheticWebSocket } from "./useSyntheticWebSocket";
+import { useSyntheticMirrorNode } from "./useSyntheticMirrorNode";
 import type {
   FestivalProgress,
   HCSMessage,
@@ -38,9 +40,12 @@ const MAX_TRADES = 100;
 const MAX_CHART_POINTS = 120;
 const MAX_JOBS = 50;
 
+// Build-time constant — hook call order is stable across renders
+const USE_SYNTHETIC = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+
 export function useLiveData(): LiveDataResult {
-  const ws = useWebSocket();
-  const mirror = useMirrorNode();
+  const ws = USE_SYNTHETIC ? useSyntheticWebSocket() : useWebSocket();
+  const mirror = USE_SYNTHETIC ? useSyntheticMirrorNode() : useMirrorNode();
 
   const [pnlSummary, setPnlSummary] = useState<PnLSummary | null>(null);
   const [pnlChart, setPnlChart] = useState<PnLDataPoint[]>([]);

@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 function ConnectionStatus() {
   const mode =
     process.env.NEXT_PUBLIC_USE_MOCK === "true"
-      ? "Mock"
+      ? "Synthetic"
       : process.env.NEXT_PUBLIC_USE_GRPC === "true"
         ? "gRPC"
         : "WebSocket";

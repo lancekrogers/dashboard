@@ -80,6 +80,43 @@ describe("FestivalView", () => {
     expect(getByText("50% complete")).toBeTruthy();
   });
 
+  it("renders source badge for fest data", () => {
+    const data = makeMockData();
+    const { getByText } = render(
+      <FestivalView
+        data={data}
+        source="fest"
+        isLoading={false}
+        error={null}
+      />
+    );
+    expect(getByText("Source: fest")).toBeTruthy();
+  });
+
+  it("renders fallback source badge for synthetic data", () => {
+    const data = makeMockData();
+    const { getByText } = render(
+      <FestivalView
+        data={data}
+        source="synthetic"
+        fallbackReason="fest unavailable"
+        isLoading={false}
+        error={null}
+      />
+    );
+    const badge = getByText("Source: synthetic (fallback)");
+    expect(badge).toBeTruthy();
+    expect(badge.getAttribute("title")).toBe("fest unavailable");
+  });
+
+  it("handles missing source metadata gracefully", () => {
+    const data = makeMockData();
+    const { queryByText } = render(
+      <FestivalView data={data} isLoading={false} error={null} />
+    );
+    expect(queryByText(/Source:/)).toBeNull();
+  });
+
   it("shows sequences when phase is expanded (default)", () => {
     const data = makeMockData();
     const { getByText } = render(

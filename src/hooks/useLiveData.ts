@@ -7,6 +7,7 @@ import { useSyntheticWebSocket } from "./useSyntheticWebSocket";
 import { useSyntheticMirrorNode } from "./useSyntheticMirrorNode";
 import type {
   FestivalProgress,
+  FestivalProgressSource,
   HCSMessage,
   AgentInfo,
   PnLSummary,
@@ -22,6 +23,8 @@ import type {
 
 export interface LiveDataResult {
   festivalProgress: FestivalProgress | null;
+  festivalProgressSource: FestivalProgressSource | null;
+  festivalProgressFallbackReason: string | null;
   hcsMessages: HCSMessage[];
   agents: AgentInfo[];
   pnlSummary: PnLSummary | null;
@@ -237,6 +240,8 @@ export function useLiveData(): LiveDataResult {
 
   return {
     festivalProgress: mirror.festivalProgress,
+    festivalProgressSource: mirror.festivalProgressSource,
+    festivalProgressFallbackReason: mirror.festivalProgressFallbackReason,
     hcsMessages: mirror.data ?? [],
     agents: ws.agents,
     pnlSummary,

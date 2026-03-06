@@ -17,6 +17,8 @@ export default function Home() {
       <div className="overflow-hidden min-h-0">
         <FestivalView
           data={data.festivalProgress}
+          source={data.festivalProgressSource}
+          fallbackReason={data.festivalProgressFallbackReason}
           isLoading={data.isLoading}
           error={data.error}
           className="h-full"

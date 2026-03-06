@@ -184,9 +184,15 @@ export class MirrorNodeClient {
     let senderAgent = "";
 
     try {
-      const envelope = JSON.parse(decoded);
-      if (envelope.type) messageType = envelope.type;
-      if (envelope.agentId) senderAgent = envelope.agentId;
+      const envelope = JSON.parse(decoded) as Record<string, unknown>;
+      if (typeof envelope.type === "string") {
+        messageType = envelope.type as DaemonEventType;
+      }
+      if (typeof envelope.agentId === "string") {
+        senderAgent = envelope.agentId;
+      } else if (typeof envelope.sender === "string") {
+        senderAgent = envelope.sender;
+      }
     } catch {
       // Message is not JSON-encoded daemon event; keep defaults
     }

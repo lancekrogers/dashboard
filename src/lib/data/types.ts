@@ -33,6 +33,7 @@ export type DaemonEventType =
   | "risk_check_requested"
   | "risk_check_approved"
   | "risk_check_denied"
+  | "festival_progress"
   | "agent_started"
   | "agent_stopped"
   | "agent_error";
@@ -188,6 +189,18 @@ export interface FestivalProgress {
   overallCompletionPercent: number;
 }
 
+export type FestivalProgressSource = "fest" | "synthetic";
+
+export interface FestivalProgressPayload {
+  version: string;
+  source: FestivalProgressSource;
+  selector: string;
+  snapshot_time: string;
+  stale_after_seconds?: number;
+  festivalProgress: FestivalProgress;
+  fallback_reason?: string;
+}
+
 // ============================================================
 // Connector Interfaces
 // ============================================================
@@ -222,5 +235,7 @@ export interface UseGRPCResult extends DataHookResult<DaemonEvent[]> {
 
 export interface UseMirrorNodeResult extends DataHookResult<HCSMessage[]> {
   festivalProgress: FestivalProgress | null;
+  festivalProgressSource: FestivalProgressSource | null;
+  festivalProgressFallbackReason: string | null;
   refresh: () => void;
 }

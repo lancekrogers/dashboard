@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type {
   FestivalProgress,
+  FestivalProgressSource,
   FestivalPhase,
   FestivalSequence,
   FestivalTask,
@@ -12,6 +13,8 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 
 interface FestivalViewProps {
   data: FestivalProgress | null;
+  source?: FestivalProgressSource | null;
+  fallbackReason?: string | null;
   isLoading: boolean;
   error: Error | null;
   className?: string;
@@ -136,6 +139,8 @@ function LoadingSkeleton() {
 
 export function FestivalView({
   data,
+  source = null,
+  fallbackReason = null,
   isLoading,
   error,
   className = "",
@@ -174,9 +179,19 @@ export function FestivalView({
       <div className="flex items-center justify-between mb-2 shrink-0">
         <h2 className="text-sm font-semibold text-white">Festival Progress</h2>
         {data && (
-          <span className="text-sm text-gray-400">
-            {data.overallCompletionPercent}% complete
-          </span>
+          <div className="flex items-center gap-2">
+            {source && (
+              <span
+                className="text-[11px] uppercase tracking-wide text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-1.5 py-0.5 rounded"
+                title={fallbackReason ?? undefined}
+              >
+                {source === "synthetic" ? "Source: synthetic (fallback)" : "Source: fest"}
+              </span>
+            )}
+            <span className="text-sm text-gray-400">
+              {data.overallCompletionPercent}% complete
+            </span>
+          </div>
         )}
       </div>
 

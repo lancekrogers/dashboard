@@ -78,6 +78,8 @@ export function useSyntheticMirrorNode(): UseMirrorNodeResult {
   return {
     data: messages,
     festivalProgress,
+    festivalProgressSource: "synthetic",
+    festivalProgressFallbackReason: "mock data mode",
     connectionState: "connected",
     error: null,
     isLoading: false,

@@ -7,7 +7,7 @@
 
 Real-time observer dashboard for the agent economy.
 
-Part of the [ETHDenver 2026 Agent Economy](../README.md) submission.
+Part of the [Obey Agent Economy](https://github.com/lancekrogers/Obey-Agent-Economy) project.
 
 ## Overview
 

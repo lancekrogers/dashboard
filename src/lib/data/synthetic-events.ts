@@ -4,6 +4,7 @@ import type {
   HCSMessage,
   FestivalProgress,
 } from "./types";
+import { AGENT_LOG_ENTRIES } from "./agent-log-data";
 
 // ============================================================
 // Internal state for stateful event generation
@@ -23,6 +24,7 @@ export interface SyntheticState {
   activeJobs: number;
   totalInferences: number;
   pendingRiskCheck: { taskId: string; recipient: string } | null;
+  vaultDecisionIndex: number;
 }
 
 export function createSyntheticState(): SyntheticState {
@@ -40,6 +42,7 @@ export function createSyntheticState(): SyntheticState {
     activeJobs: 3,
     totalInferences: 5678,
     pendingRiskCheck: null,
+    vaultDecisionIndex: 0,
   };
 }
 
@@ -288,6 +291,34 @@ export function generateTaskAssignment(state: SyntheticState): DaemonEvent {
 }
 
 // ============================================================
+// Vault decision generator (replays real agent_log.json data)
+// ============================================================
+
+export function generateVaultDecision(state: SyntheticState): DaemonEvent {
+  const entry = AGENT_LOG_ENTRIES[state.vaultDecisionIndex % AGENT_LOG_ENTRIES.length];
+  state.vaultDecisionIndex++;
+
+  return {
+    type: "vault_decision" as DaemonEventType,
+    agentId: "defi-001",
+    agentName: "defi",
+    timestamp: now(),
+    payload: {
+      timestamp: entry.timestamp,
+      phase: entry.phase,
+      action: entry.action,
+      festival_id: entry.festival_id,
+      tools_used: entry.tools_used,
+      decision: entry.decision,
+      reasoning: entry.reasoning,
+      execution: entry.execution ?? undefined,
+      verification: entry.verification ?? undefined,
+      duration_ms: entry.duration_ms,
+    },
+  };
+}
+
+// ============================================================
 // HCS message conversion
 // ============================================================
 
@@ -316,79 +347,153 @@ export function eventToHCSMessage(event: DaemonEvent, seqNum: number): HCSMessag
 // Static festival progress (moved from mock.ts)
 // ============================================================
 
+// Real festival data from: fest show --festival synthesis-fest-ritual-runtime-SF0002
+// and fest show --festival agent-market-research-RI-AM0001-0009
 export function generateFestivalProgress(): FestivalProgress {
   return {
-    festivalId: "DA0001",
-    festivalName: "dashboard",
-    overallCompletionPercent: 72,
+    festivalId: "SF0002",
+    festivalName: "synthesis-fest-ritual-runtime",
+    overallCompletionPercent: 100,
     phases: [
       {
         id: "001_IMPLEMENT",
         name: "IMPLEMENT",
-        status: "active",
-        completionPercent: 72,
+        status: "completed",
+        completionPercent: 100,
         sequences: [
           {
-            id: "01_data_layer", name: "data_layer", status: "completed", completionPercent: 100,
+            id: "01_ritual_contract", name: "ritual_contract", status: "completed", completionPercent: 100,
             tasks: [
-              { id: "01", name: "link_project", status: "completed", autonomy: "medium" },
-              { id: "02", name: "design_data_layer", status: "completed", autonomy: "medium" },
-              { id: "03", name: "implement_websocket", status: "completed", autonomy: "medium" },
-              { id: "04", name: "implement_grpc", status: "completed", autonomy: "medium" },
-              { id: "05", name: "implement_mirror_node", status: "completed", autonomy: "medium" },
-              { id: "06", name: "testing", status: "completed", autonomy: "medium" },
-              { id: "07", name: "review", status: "completed", autonomy: "low" },
-              { id: "08", name: "iterate", status: "completed", autonomy: "medium" },
+              { id: "01", name: "audit_current_ritual_template", status: "completed", autonomy: "medium" },
+              { id: "02", name: "define_artifact_contract", status: "completed", autonomy: "medium" },
+              { id: "03", name: "tighten_unattended_workflow", status: "completed", autonomy: "medium" },
+              { id: "04", name: "validate_go_and_no_go_paths", status: "completed", autonomy: "medium" },
+              { id: "05", name: "testing", status: "completed", autonomy: "medium" },
+              { id: "06", name: "review", status: "completed", autonomy: "low" },
+              { id: "07", name: "iterate", status: "completed", autonomy: "medium" },
+              { id: "08", name: "fest_commit", status: "completed", autonomy: "medium" },
             ],
           },
           {
-            id: "02_festival_view", name: "festival_view", status: "completed", completionPercent: 100,
+            id: "02_fest_runtime_bridge", name: "fest_runtime_bridge", status: "completed", completionPercent: 100,
             tasks: [
-              { id: "01", name: "design_component", status: "completed", autonomy: "medium" },
-              { id: "02", name: "implement_panel", status: "completed", autonomy: "medium" },
-              { id: "03", name: "testing", status: "completed", autonomy: "medium" },
+              { id: "01", name: "map_fest_cli_command_contract", status: "completed", autonomy: "medium" },
+              { id: "02", name: "implement_ritual_run_invocation", status: "completed", autonomy: "medium" },
+              { id: "03", name: "add_run_inspection_and_timeouts", status: "completed", autonomy: "medium" },
+              { id: "04", name: "resolve_artifact_paths", status: "completed", autonomy: "medium" },
+              { id: "05", name: "testing", status: "completed", autonomy: "medium" },
+              { id: "06", name: "review", status: "completed", autonomy: "low" },
+              { id: "07", name: "iterate", status: "completed", autonomy: "medium" },
+              { id: "08", name: "fest_commit", status: "completed", autonomy: "medium" },
             ],
           },
           {
-            id: "03_hcs_feed", name: "hcs_feed", status: "completed", completionPercent: 100,
+            id: "03_obey_daemon_runtime", name: "obey_daemon_runtime", status: "completed", completionPercent: 100,
             tasks: [
-              { id: "01", name: "design_component", status: "completed", autonomy: "medium" },
-              { id: "02", name: "implement_panel", status: "completed", autonomy: "medium" },
-              { id: "03", name: "testing", status: "completed", autonomy: "medium" },
+              { id: "01", name: "extend_obey_session_wrapper", status: "completed", autonomy: "medium" },
+              { id: "02", name: "add_daemon_preflight_and_logging", status: "completed", autonomy: "medium" },
+              { id: "03", name: "bind_session_to_ritual_workdir", status: "completed", autonomy: "medium" },
+              { id: "04", name: "verify_non_deterministic_runtime", status: "completed", autonomy: "medium" },
+              { id: "05", name: "testing", status: "completed", autonomy: "medium" },
+              { id: "06", name: "review", status: "completed", autonomy: "low" },
+              { id: "07", name: "iterate", status: "completed", autonomy: "medium" },
+              { id: "08", name: "fest_commit", status: "completed", autonomy: "medium" },
             ],
           },
           {
-            id: "04_agent_activity", name: "agent_activity", status: "completed", completionPercent: 100,
+            id: "04_ritual_decision_loop", name: "ritual_decision_loop", status: "completed", completionPercent: 100,
             tasks: [
-              { id: "01", name: "design_component", status: "completed", autonomy: "medium" },
-              { id: "02", name: "implement_panel", status: "completed", autonomy: "medium" },
-              { id: "03", name: "testing", status: "completed", autonomy: "medium" },
+              { id: "01", name: "insert_ritual_at_cycle_start", status: "completed", autonomy: "medium" },
+              { id: "02", name: "parse_decision_json", status: "completed", autonomy: "medium" },
+              { id: "03", name: "gate_trades_on_ritual_go", status: "completed", autonomy: "medium" },
+              { id: "04", name: "preserve_rationale_and_guardrails", status: "completed", autonomy: "medium" },
+              { id: "05", name: "testing", status: "completed", autonomy: "medium" },
+              { id: "06", name: "review", status: "completed", autonomy: "low" },
+              { id: "07", name: "iterate", status: "completed", autonomy: "medium" },
+              { id: "08", name: "fest_commit", status: "completed", autonomy: "medium" },
             ],
           },
           {
-            id: "05_defi_pnl", name: "defi_pnl", status: "active", completionPercent: 60,
+            id: "05_artifact_aggregation", name: "artifact_aggregation", status: "completed", completionPercent: 100,
             tasks: [
-              { id: "01", name: "design_component", status: "completed", autonomy: "medium" },
-              { id: "02", name: "implement_panel", status: "completed", autonomy: "medium" },
-              { id: "03", name: "testing", status: "active", autonomy: "medium" },
-              { id: "04", name: "review", status: "pending", autonomy: "low" },
-              { id: "05", name: "iterate", status: "pending", autonomy: "medium" },
+              { id: "01", name: "refactor_or_wrap_loggen", status: "completed", autonomy: "medium" },
+              { id: "02", name: "refresh_agent_log_after_cycle", status: "completed", autonomy: "medium" },
+              { id: "03", name: "verify_archived_artifact_intake", status: "completed", autonomy: "medium" },
+              { id: "04", name: "document_protocol_labs_evidence", status: "completed", autonomy: "medium" },
+              { id: "05", name: "testing", status: "completed", autonomy: "medium" },
+              { id: "06", name: "review", status: "completed", autonomy: "low" },
+              { id: "07", name: "iterate", status: "completed", autonomy: "medium" },
+              { id: "08", name: "fest_commit", status: "completed", autonomy: "medium" },
             ],
           },
           {
-            id: "06_inference_metrics", name: "inference_metrics", status: "pending", completionPercent: 0,
+            id: "06_end_to_end_verification", name: "end_to_end_verification", status: "completed", completionPercent: 100,
             tasks: [
-              { id: "01", name: "design_component", status: "pending", autonomy: "medium" },
-              { id: "02", name: "implement_panel", status: "pending", autonomy: "medium" },
-              { id: "03", name: "testing", status: "pending", autonomy: "medium" },
+              { id: "01", name: "run_live_daemon_backed_ritual_cycles", status: "completed", autonomy: "medium" },
+              { id: "02", name: "verify_go_and_no_go_outcomes", status: "completed", autonomy: "medium" },
+              { id: "03", name: "rehearse_demo_evidence", status: "completed", autonomy: "medium" },
+              { id: "04", name: "stabilize_final_blockers", status: "completed", autonomy: "medium" },
+              { id: "05", name: "testing", status: "completed", autonomy: "medium" },
+              { id: "06", name: "review", status: "completed", autonomy: "low" },
+              { id: "07", name: "iterate", status: "completed", autonomy: "medium" },
+              { id: "08", name: "fest_commit", status: "completed", autonomy: "medium" },
             ],
           },
+        ],
+      },
+    ],
+  };
+}
+
+// Real ritual run data from: fest show --festival agent-market-research-RI-AM0001-0009
+export function generateRitualProgress(): FestivalProgress {
+  return {
+    festivalId: "RI-AM0001-0009",
+    festivalName: "agent-market-research",
+    overallCompletionPercent: 100,
+    phases: [
+      {
+        id: "001_INGEST", name: "INGEST", status: "completed", completionPercent: 100,
+        sequences: [
           {
-            id: "07_demo_polish", name: "demo_polish", status: "pending", completionPercent: 0,
+            id: "01_ingest_steps", name: "market_data_collection", status: "completed", completionPercent: 100,
             tasks: [
-              { id: "01", name: "layout_tuning", status: "pending", autonomy: "medium" },
-              { id: "02", name: "mock_data", status: "pending", autonomy: "medium" },
-              { id: "03", name: "performance_verify", status: "pending", autonomy: "medium" },
+              { id: "01", name: "QUERY POOL STATE", status: "completed", autonomy: "high" },
+              { id: "02", name: "COLLECT PRICE HISTORY", status: "completed", autonomy: "high" },
+              { id: "03", name: "GET VOLUME AND VOLATILITY", status: "completed", autonomy: "high" },
+              { id: "04", name: "QUERY VAULT STATE", status: "completed", autonomy: "high" },
+              { id: "05", name: "VALIDATE AND PACKAGE", status: "completed", autonomy: "high" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "002_RESEARCH", name: "RESEARCH", status: "completed", completionPercent: 100,
+        sequences: [
+          {
+            id: "01_analysis_steps", name: "signal_analysis", status: "completed", completionPercent: 100,
+            tasks: [
+              { id: "01", name: "COMPUTE MOVING AVERAGE", status: "completed", autonomy: "high" },
+              { id: "02", name: "CALCULATE PRICE DEVIATION", status: "completed", autonomy: "high" },
+              { id: "03", name: "RUN CRE RISK GATES", status: "completed", autonomy: "high" },
+              { id: "04", name: "SCORE OPPORTUNITY", status: "completed", autonomy: "high" },
+              { id: "05", name: "SYNTHESIZE FINDINGS", status: "completed", autonomy: "high" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "003_DECIDE", name: "DECIDE", status: "completed", completionPercent: 100,
+        sequences: [
+          {
+            id: "01_synthesize_decision", name: "synthesize_decision", status: "completed", completionPercent: 100,
+            tasks: [
+              { id: "01", name: "aggregate_findings", status: "completed", autonomy: "medium" },
+              { id: "02", name: "produce_decision", status: "completed", autonomy: "medium" },
+              { id: "03", name: "generate_log_entry", status: "completed", autonomy: "medium" },
+              { id: "04", name: "validate_decision", status: "completed", autonomy: "medium" },
+              { id: "05", name: "review_rationale", status: "completed", autonomy: "low" },
+              { id: "06", name: "iterate_if_needed", status: "completed", autonomy: "medium" },
             ],
           },
         ],

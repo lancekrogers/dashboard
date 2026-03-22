@@ -45,12 +45,18 @@ const MAX_TRADES = 100;
 const MAX_CHART_POINTS = 120;
 const MAX_JOBS = 50;
 
-// Build-time constant — hook call order is stable across renders
-const USE_SYNTHETIC = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+// Build-time constants — hook call order must be stable across renders.
+// USE_MOCK_WS: true = client-side synthetic events, false = real coordinator WebSocket
+// USE_MOCK_MIRROR: true = synthetic festival/HCS data, false = real Hedera Mirror Node
+// When agents are running with mock externals (demo mode), set:
+//   NEXT_PUBLIC_USE_MOCK=false (real WebSocket) + NEXT_PUBLIC_USE_MOCK_MIRROR=true (no real Hedera)
+const USE_MOCK_WS = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+const USE_MOCK_MIRROR = process.env.NEXT_PUBLIC_USE_MOCK === "true" ||
+  process.env.NEXT_PUBLIC_USE_MOCK_MIRROR === "true";
 
 export function useLiveData(): LiveDataResult {
-  const ws = USE_SYNTHETIC ? useSyntheticWebSocket() : useWebSocket();
-  const mirror = USE_SYNTHETIC ? useSyntheticMirrorNode() : useMirrorNode();
+  const ws = USE_MOCK_WS ? useSyntheticWebSocket() : useWebSocket();
+  const mirror = USE_MOCK_MIRROR ? useSyntheticMirrorNode() : useMirrorNode();
 
   const [pnlSummary, setPnlSummary] = useState<PnLSummary | null>(null);
   const [pnlChart, setPnlChart] = useState<PnLDataPoint[]>([]);

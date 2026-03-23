@@ -14,6 +14,7 @@ import {
   generatePaymentSettled,
   eventToHCSMessage,
   generateFestivalProgress,
+  generateRitualProgress,
   type SyntheticState,
 } from "@/lib/data/synthetic-events";
 
@@ -38,7 +39,16 @@ export function useSyntheticMirrorNode(): UseMirrorNodeResult {
   const stateRef = useRef<SyntheticState>(createSyntheticState());
   const seqRef = useRef(1);
   const [messages, setMessages] = useState<HCSMessage[]>([]);
-  const festivalProgress = generateFestivalProgress();
+  // Alternate between the implementation festival and a ritual run
+  // so judges see both the planning hierarchy and the agent decision pipeline
+  const [showRitual, setShowRitual] = useState(false);
+  const festivalProgress = showRitual ? generateRitualProgress() : generateFestivalProgress();
+
+  // Toggle between festivals every 15 seconds
+  useEffect(() => {
+    const toggle = setInterval(() => setShowRitual((prev) => !prev), 15000);
+    return () => clearInterval(toggle);
+  }, []);
 
   useEffect(() => {
     const s = stateRef.current;

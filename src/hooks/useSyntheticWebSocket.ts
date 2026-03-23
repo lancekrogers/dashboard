@@ -13,6 +13,7 @@ import {
   generatePnLReport,
   generatePaymentSettled,
   generateTaskAssignment,
+  generateVaultDecision,
   type SyntheticState,
 } from "@/lib/data/synthetic-events";
 
@@ -126,6 +127,14 @@ export function useSyntheticWebSocket(): UseWebSocketResult {
     // Kick off first task assignment quickly for CRE panel
     const firstTask = setTimeout(() => pushEvent(generateTaskAssignment(s)), 1000);
 
+    // Vault decisions: replay real agent_log.json entries every 8s
+    const vaultTimer = setInterval(() => {
+      pushEvent(generateVaultDecision(s));
+    }, 8000);
+
+    // Kick off first vault decision quickly
+    const firstVault = setTimeout(() => pushEvent(generateVaultDecision(s)), 1500);
+
     return () => {
       heartbeatTimers.forEach(clearInterval);
       clearInterval(tradeTimer);
@@ -134,10 +143,12 @@ export function useSyntheticWebSocket(): UseWebSocketResult {
       clearInterval(pnlTimer);
       clearInterval(paymentTimer);
       clearInterval(taskTimer);
+      clearInterval(vaultTimer);
       clearTimeout(firstTrade);
       clearTimeout(firstInference);
       clearTimeout(firstRisk);
       clearTimeout(firstTask);
+      clearTimeout(firstVault);
     };
   }, [pushEvent]);
 

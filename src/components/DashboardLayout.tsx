@@ -32,7 +32,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
         <ConnectionStatus />
       </header>
-      <main className="grid grid-cols-3 grid-rows-[1fr_1fr] gap-3 p-3 flex-1 min-h-0">
+      <main className="grid grid-cols-4 grid-rows-[1fr_1fr] gap-3 p-3 flex-1 min-h-0">
         {children}
       </main>
     </div>

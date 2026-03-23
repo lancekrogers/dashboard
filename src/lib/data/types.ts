@@ -36,7 +36,8 @@ export type DaemonEventType =
   | "festival_progress"
   | "agent_started"
   | "agent_stopped"
-  | "agent_error";
+  | "agent_error"
+  | "vault_decision";
 
 export interface DaemonEvent {
   type: DaemonEventType;
@@ -199,6 +200,33 @@ export interface FestivalProgressPayload {
   stale_after_seconds?: number;
   festivalProgress: FestivalProgress;
   fallback_reason?: string;
+}
+
+// ============================================================
+// Vault Decision Types
+// ============================================================
+
+export interface VaultDecision {
+  id: string;
+  timestamp: string;
+  decision: "GO" | "NO_GO";
+  phase: "discover" | "execute";
+  action: string;
+  ritualId: string;
+  confidence: number;
+  deviationPct: number;
+  gatesPassed: string;
+  netProfitEstimateUsd: number;
+  signal: string;
+  toolsUsed: string[];
+  txHash: string | null;
+  chain: string | null;
+  tokenIn: string | null;
+  tokenOut: string | null;
+  amountIn: string | null;
+  amountOut: string | null;
+  withinTolerance: boolean | null;
+  durationMs: number;
 }
 
 // ============================================================

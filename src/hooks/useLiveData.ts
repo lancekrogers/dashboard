@@ -19,6 +19,7 @@ import type {
   InferenceJob,
   ConnectionState,
   DaemonEvent,
+  VaultDecision,
 } from "@/lib/data/types";
 
 export interface LiveDataResult {
@@ -34,6 +35,7 @@ export interface LiveDataResult {
   storage: StorageMetrics | null;
   inft: INFTStatus | null;
   inferenceJobs: InferenceJob[];
+  vaultDecisions: VaultDecision[];
   connectionState: ConnectionState;
   isLoading: boolean;
   error: Error | null;
@@ -43,12 +45,18 @@ const MAX_TRADES = 100;
 const MAX_CHART_POINTS = 120;
 const MAX_JOBS = 50;
 
-// Build-time constant — hook call order is stable across renders
-const USE_SYNTHETIC = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+// Build-time constants — hook call order must be stable across renders.
+// USE_MOCK_WS: true = client-side synthetic events, false = real coordinator WebSocket
+// USE_MOCK_MIRROR: true = synthetic festival/HCS data, false = real Hedera Mirror Node
+// When agents are running with mock externals (demo mode), set:
+//   NEXT_PUBLIC_USE_MOCK=false (real WebSocket) + NEXT_PUBLIC_USE_MOCK_MIRROR=true (no real Hedera)
+const USE_MOCK_WS = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+const USE_MOCK_MIRROR = process.env.NEXT_PUBLIC_USE_MOCK === "true" ||
+  process.env.NEXT_PUBLIC_USE_MOCK_MIRROR === "true";
 
 export function useLiveData(): LiveDataResult {
-  const ws = USE_SYNTHETIC ? useSyntheticWebSocket() : useWebSocket();
-  const mirror = USE_SYNTHETIC ? useSyntheticMirrorNode() : useMirrorNode();
+  const ws = USE_MOCK_WS ? useSyntheticWebSocket() : useWebSocket();
+  const mirror = USE_MOCK_MIRROR ? useSyntheticMirrorNode() : useMirrorNode();
 
   const [pnlSummary, setPnlSummary] = useState<PnLSummary | null>(null);
   const [pnlChart, setPnlChart] = useState<PnLDataPoint[]>([]);
@@ -57,6 +65,7 @@ export function useLiveData(): LiveDataResult {
   const [storage, setStorage] = useState<StorageMetrics | null>(null);
   const [inft, setInft] = useState<INFTStatus | null>(null);
   const [inferenceJobs, setInferenceJobs] = useState<InferenceJob[]>([]);
+  const [vaultDecisions, setVaultDecisions] = useState<VaultDecision[]>([]);
 
   // Process incoming WebSocket events to extract structured data
   useEffect(() => {
@@ -204,6 +213,36 @@ export function useLiveData(): LiveDataResult {
         break;
       }
 
+      case "vault_decision": {
+        const exec = p.execution as Record<string, unknown> | undefined;
+        const verification = p.verification as Record<string, unknown> | undefined;
+        const reasoning = p.reasoning as Record<string, unknown> | undefined;
+        const decision: VaultDecision = {
+          id: `vd-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          timestamp: (p.timestamp as string) ?? event.timestamp,
+          decision: (p.decision as "GO" | "NO_GO") ?? "NO_GO",
+          phase: (p.phase as "discover" | "execute") ?? "discover",
+          action: (p.action as string) ?? "",
+          ritualId: (p.festival_id as string) ?? "",
+          confidence: (reasoning?.confidence as number) ?? 0,
+          deviationPct: (reasoning?.deviation_pct as number) ?? 0,
+          gatesPassed: (reasoning?.gates_passed as string) ?? "",
+          netProfitEstimateUsd: (reasoning?.net_profit_estimate_usd as number) ?? 0,
+          signal: (reasoning?.signal as string) ?? "",
+          toolsUsed: (p.tools_used as string[]) ?? [],
+          txHash: (exec?.tx_hash as string) ?? null,
+          chain: (exec?.chain as string) ?? null,
+          tokenIn: (exec?.token_in as string) ?? null,
+          tokenOut: (exec?.token_out as string) ?? null,
+          amountIn: (exec?.amount_in as string) ?? null,
+          amountOut: (exec?.amount_out as string) ?? null,
+          withinTolerance: (verification?.within_tolerance as boolean) ?? null,
+          durationMs: (p.duration_ms as number) ?? 0,
+        };
+        setVaultDecisions((prev) => [...prev, decision]);
+        break;
+      }
+
       case "payment_settled": {
         // Could also update P&L from payment events
         if (p.amount && p.txHash) {
@@ -251,6 +290,7 @@ export function useLiveData(): LiveDataResult {
     storage,
     inft,
     inferenceJobs,
+    vaultDecisions,
     connectionState,
     isLoading: ws.isLoading || mirror.isLoading,
     error: ws.error || mirror.error,
